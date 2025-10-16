@@ -88,7 +88,7 @@ set(FREERTOS_DEMO_SOURCES
     # ${CMAKE_CURRENT_LIST_DIR}/source/TaskNotify.c
     # ${CMAKE_CURRENT_LIST_DIR}/source/TaskNotifyArray.c
     # ${CMAKE_CURRENT_LIST_DIR}/source/TimerDemo.c
-    ${CMAKE_CURRENT_LIST_DIR}/main.c)
+    ${CMAKE_CURRENT_LIST_DIR}/source/main.c)
 
 set(FREERTOS_DEMO_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/include)
 
