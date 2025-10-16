@@ -1,0 +1,4 @@
+execute_process(COMMAND git clone --depth 1 https://github.com/jasonpcarroll/supported-targets-hub.git temp_repo WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+execute_process(COMMAND ${CMAKE_COMMAND} -E remove_directory temp_repo/.git WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory temp_repo . WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+execute_process(COMMAND ${CMAKE_COMMAND} -E remove_directory temp_repo WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
