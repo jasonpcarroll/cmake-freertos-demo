@@ -37,7 +37,7 @@ endif()
 
 FetchContent_Declare(
   freertos_kernel
-  GIT_REPOSITORY https://github.com/jasonpcarroll/FreeRTOS-Kernel.git
+  GIT_REPOSITORY https://github.com/FreeRTOS/FreeRTOS-Kernel.git
   GIT_TAG main
   GIT_PROGRESS TRUE)
 
