@@ -1,6 +1,4 @@
-# This starter workflow is for a CMake project running on multiple platforms. There is a different starter workflow if you just want a single platform.
-# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
-name: Build
+name: Build Demos
 
 on:
   push:
@@ -8,17 +6,33 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  generate-matrix:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    name: FreeRTOS-Kenel demo builds for ${{ matrix.os }}
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    name: generate-matrix-${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - name: Generate matrix
+        id: set-matrix
+        shell: bash
+        run: |
+          presets=$(cmake --list-presets | grep -o '"[^"]*"' | tr -d '"' | jq -R -s -c 'split("\n")[:-1]')
+          matrix=$(echo "$presets" | jq -c --arg os "${{ matrix.os }}" '[.[] | {"os": $os, "preset": .}]')
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
-    - name: Fetch configuration presets
-      run: cmake -P fetch_presets.cmake
-
-    - name: List Presets
-      run: cmake --list-presets
+  build:
+    needs: generate-matrix
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build with preset
+        run: |
+          cmake --preset ${{ matrix.preset }}
+          cmake --build --preset ${{ matrix.preset }}
