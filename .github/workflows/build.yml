@@ -6,38 +6,80 @@ on:
   workflow_dispatch:
 
 jobs:
-  generate-presets-matrix:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+  generate-matrix-ubuntu:
+    runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
-    name: Generate Presets Matrix for ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - name: Generate matrix
+        id: set-matrix
+        run: |
+          presets=$(cmake --list-presets | grep -o '"[^"]*"' | tr -d '"' | jq -R -s -c 'split("\n")[:-1]')
+          matrix=$(echo "$presets" | jq -c --arg os "ubuntu-latest" '[.[] | {"os": $os, "preset": .}]')
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
-      - name: Fetch presets
-        run: cmake -P fetch_presets.cmake
+  build-ubuntu:
+    needs: generate-matrix-ubuntu
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.generate-matrix-ubuntu.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build with preset
+        run: |
+          cmake --preset ${{ matrix.preset }}
+          cmake --build --preset ${{ matrix.preset }}
 
+  generate-matrix-windows:
+    runs-on: windows-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
       - name: Generate matrix
         id: set-matrix
         shell: bash
         run: |
           presets=$(cmake --list-presets | grep -o '"[^"]*"' | tr -d '"' | jq -R -s -c 'split("\n")[:-1]')
-          matrix=$(echo "$presets" | jq -c --arg os "${{ matrix.os }}" '[.[] | {"os": $os, "preset": .}]')
+          matrix=$(echo "$presets" | jq -c --arg os "windows-latest" '[.[] | {"os": $os, "preset": .}]')
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
-  build:
-    needs: generate-presets-matrix
-    runs-on: ${{ matrix.os }}
+  build-windows:
+    needs: generate-matrix-windows
+    runs-on: windows-latest
     strategy:
       matrix:
-        include: ${{ fromJson(needs.generate-presets-matrix.outputs.matrix) }}
+        include: ${{ fromJson(needs.generate-matrix-windows.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - name: Fetch presets
-        run: cmake -P fetch_presets.cmake
+      - name: Build with preset
+        run: |
+          cmake --preset ${{ matrix.preset }}
+          cmake --build --preset ${{ matrix.preset }}
+
+  generate-matrix-macos:
+    runs-on: macos-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate matrix
+        id: set-matrix
+        run: |
+          presets=$(cmake --list-presets | grep -o '"[^"]*"' | tr -d '"' | jq -R -s -c 'split("\n")[:-1]')
+          matrix=$(echo "$presets" | jq -c --arg os "macos-latest" '[.[] | {"os": $os, "preset": .}]')
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+
+  build-macos:
+    needs: generate-matrix-macos
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.generate-matrix-macos.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
       - name: Build with preset
         run: |
           cmake --preset ${{ matrix.preset }}
