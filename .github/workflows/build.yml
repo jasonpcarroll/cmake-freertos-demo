@@ -36,7 +36,8 @@ jobs:
         include: ${{ fromJson(needs.generate-presets-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-  
+      - name: Fetch presets
+        run: cmake -P fetch_presets.cmake
       - name: Build with preset
         run: |
           cmake --preset ${{ matrix.preset }}
