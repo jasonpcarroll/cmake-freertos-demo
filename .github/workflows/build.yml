@@ -6,16 +6,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  generate-matrix:
+  generate-presets-matrix:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
-    name: generate-matrix-${{ matrix.os }}
+    name: Generate Presets Matrix for ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Fetch presets
+        run: cmake -P fetch_presets.cmake
+
       - name: Generate matrix
         id: set-matrix
         shell: bash
@@ -25,13 +29,14 @@ jobs:
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
   build:
-    needs: generate-matrix
+    needs: generate-presets-matrix
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
+  
       - name: Build with preset
         run: |
           cmake --preset ${{ matrix.preset }}
