@@ -39,6 +39,7 @@ jobs:
           cmake --build --preset ${{ matrix.preset }}
       - name: List binary directory
         if: always()
+        shell: bash
         run: ls -la build/${{ matrix.preset }}
 
   generate-matrix-windows:
@@ -75,6 +76,7 @@ jobs:
           cmake --build --preset ${{ matrix.preset }}
       - name: List binary directory
         if: always()
+        shell: bash
         run: ls -la build/${{ matrix.preset }}
 
   generate-matrix-macos:
@@ -110,4 +112,5 @@ jobs:
           cmake --build --preset ${{ matrix.preset }}
       - name: List binary directory
         if: always()
+        shell: bash
         run: ls -la build/${{ matrix.preset }}
