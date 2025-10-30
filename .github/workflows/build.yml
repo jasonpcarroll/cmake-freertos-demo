@@ -12,6 +12,8 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
+      - name: Fetch presets
+        run: cmake -P fetch_presets.cmake
       - name: Generate matrix
         id: set-matrix
         run: |
@@ -27,6 +29,8 @@ jobs:
         include: ${{ fromJson(needs.generate-matrix-ubuntu.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
+      - name: Fetch presets
+        run: cmake -P fetch_presets.cmake
       - name: Build with preset
         run: |
           cmake --preset ${{ matrix.preset }}
@@ -38,6 +42,8 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
+      - name: Fetch presets
+        run: cmake -P fetch_presets.cmake
       - name: Generate matrix
         id: set-matrix
         shell: bash
@@ -54,6 +60,8 @@ jobs:
         include: ${{ fromJson(needs.generate-matrix-windows.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
+      - name: Fetch presets
+        run: cmake -P fetch_presets.cmake
       - name: Build with preset
         run: |
           cmake --preset ${{ matrix.preset }}
@@ -65,6 +73,8 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
+      - name: Fetch presets
+        run: cmake -P fetch_presets.cmake
       - name: Generate matrix
         id: set-matrix
         run: |
@@ -80,6 +90,8 @@ jobs:
         include: ${{ fromJson(needs.generate-matrix-macos.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
+      - name: Fetch presets
+        run: cmake -P fetch_presets.cmake
       - name: Build with preset
         run: |
           cmake --preset ${{ matrix.preset }}
