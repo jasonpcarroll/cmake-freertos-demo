@@ -43,6 +43,10 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(freertos_kernel)
 
+if(TARGET board_support_package)
+  target_link_libraries(board_support_package PUBLIC freertos_kernel)
+endif()
+
 # ------------------------------------------------------------------------------
 # Targets
 # ------------------------------------------------------------------------------

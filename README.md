@@ -1,1 +1,1 @@
-# CMake FreeRTOS Demo
+# supported-targets-hub
