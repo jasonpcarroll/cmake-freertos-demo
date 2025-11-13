@@ -24,6 +24,17 @@ static void prvTestTask( void * pvParameters )
     }
 }
 
+static void prvTestTask2( void * pvParameters )
+{
+    ( void ) pvParameters;
+
+    while( 1 )
+    {
+        LogInfo( ( "TEST2" ) );
+        vTaskDelay( 100 );
+    }
+}
+
 int main( void )
 {
     vLoggingInit();
@@ -31,6 +42,7 @@ int main( void )
     LogInfo( ( "Starting FreeRTOS-Kernel demo..." ) );
 
     xTaskCreate( prvTestTask, "Test", configMINIMAL_STACK_SIZE * 2, NULL, 1, NULL );
+    xTaskCreate( prvTestTask2, "Test2", configMINIMAL_STACK_SIZE * 2, NULL, 1, NULL );
 
     vTaskStartScheduler();
 }
